@@ -3,7 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load an image
-image = cv2.imread("path/to/your/image.png")
+image = cv2.imread(r"images\nut_good.png")
+
+print("Image dimensions:", image.shape)
+print("Data type:", image.dtype)
+print("Pixel values:", image[0, 0])
 
 # Check whether the image loaded successfully
 if image is None:
