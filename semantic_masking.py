@@ -72,6 +72,62 @@ plt.title("Final Masked Image")
 plt.axis("off")
 plt.show()
 
+# Find contours in the cleaned mask
+contours, hierarchy = cv2.findContours(
+    cleaned_mask,
+    cv2.RETR_EXTERNAL,
+    cv2.CHAIN_APPROX_SIMPLE
+)
+
+print("Number of contours found:", len(contours))
+
+# Create a copy of the original image
+contour_image = image.copy()
+
+# Draw all detected contours
+cv2.drawContours(
+    contour_image,
+    contours,
+    -1,
+    (255, 0, 0),
+    2
+)
+
+# Display result
+plt.imshow(contour_image)
+plt.title("Detected Contours")
+plt.axis("off")
+plt.show()
+
+# Find the largest contour
+largest_contour = max(contours, key=cv2.contourArea)
+
+# Calculate its area
+area = cv2.contourArea(largest_contour)
+
+print("Largest contour area:", area)
+
+x, y, w, h = cv2.boundingRect(largest_contour)
+
+# Draw rectangle around object
+bounding_image = image.copy()
+
+cv2.rectangle(
+    bounding_image,
+    (x, y),
+    (x + w, y + h),
+    (255, 0, 0),
+    2
+)
+
+plt.imshow(bounding_image)
+plt.title("Object Bounding Box")
+plt.axis("off")
+plt.show()
+
+print("Object position:", x, y)
+print("Object dimensions:", w, h)
+
 # Calcualte percentage of pixals masked
 foreground_pixels = np.count_nonzero(mask)
 total_pixels = mask.size
