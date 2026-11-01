@@ -128,6 +128,46 @@ plt.show()
 print("Object position:", x, y)
 print("Object dimensions:", w, h)
 
+# Create a completely black mask
+contour_mask = np.zeros(
+    image.shape[:2],
+    dtype=np.uint8
+)
+
+# Fill the largest contour with white
+cv2.drawContours(
+    contour_mask,
+    [largest_contour],
+    -1,
+    255,
+    thickness=cv2.FILLED
+)
+
+# Apply the refined mask
+refined_image = cv2.bitwise_and(
+    image,
+    image,
+    mask=contour_mask
+)
+
+# Display results
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+axes[0].imshow(image)
+axes[0].set_title("Original Image")
+
+axes[1].imshow(contour_mask, cmap="gray")
+axes[1].set_title("Contour Mask")
+
+axes[2].imshow(refined_image)
+axes[2].set_title("Refined Object")
+
+for ax in axes:
+    ax.axis("off")
+
+plt.tight_layout()
+plt.show()
+
 # Calcualte percentage of pixals masked
 foreground_pixels = np.count_nonzero(mask)
 total_pixels = mask.size
