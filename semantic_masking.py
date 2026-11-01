@@ -19,48 +19,61 @@ if image is None:
 # Convert BGR to RGB for displaying
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-# Display image
-plt.imshow(image)
-plt.title("Original Metal Nut")
-plt.axis("off")
-plt.show()
-
-# Inspect image properties
-print("Image dimensions:", image.shape)
-print("Data type:", image.dtype)
-print("Pixel values:", image[0, 0])
-
 gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
-# Display grayscale image
-plt.imshow(gray, cmap="gray")
-plt.title("Grayscale Image")
-plt.axis("off")
-plt.show()
-
-# Generate binary mask using thresholding
+# Create threshold mask
 _, mask = cv2.threshold(
     gray,
-    50,
+    35,
     255,
     cv2.THRESH_BINARY
 )
 
-# Display mask
-plt.imshow(mask, cmap="gray")
-plt.title("Binary Mask")
-plt.axis("off")
-plt.show()
-
-# Apply mask to original image
+# Apply mask
 masked_image = cv2.bitwise_and(
     image,
     image,
     mask=mask
 )
 
-# Display result
-plt.imshow(masked_image)
-plt.title("Masked Image")
+# Create a 3x3 kernel
+kernel = np.ones((7, 7), np.uint8)
+
+# Apply morphological closing
+cleaned_mask = cv2.morphologyEx(
+    mask,
+    cv2.MORPH_CLOSE,
+    kernel
+)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+
+axes[0].imshow(mask, cmap="gray")
+axes[0].set_title("Original Mask")
+
+axes[1].imshow(cleaned_mask, cmap="gray")
+axes[1].set_title("Mask After Closing")
+
+for ax in axes:
+    ax.axis("off")
+
+plt.tight_layout()
+plt.show()
+
+# Cleaned image
+cleaned_image = cv2.bitwise_and(
+    image,
+    image,
+    mask=cleaned_mask
+)
+
+plt.imshow(cleaned_image)
+plt.title("Final Masked Image")
 plt.axis("off")
 plt.show()
+
+# Calcualte percentage of pixals masked
+foreground_pixels = np.count_nonzero(mask)
+total_pixels = mask.size
+percentage = (foreground_pixels / total_pixels) * 100
+print(f"Foreground: {percentage:.2f}%")
